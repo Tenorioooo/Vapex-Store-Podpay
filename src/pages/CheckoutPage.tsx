@@ -103,13 +103,8 @@ export default function CheckoutPage() {
                 alert("Erro ao gerar PIX real: " + (pixResult.error || "Verifique as chaves no .env"));
               }
             } else {
-              // MODO DE TESTE LOCAL
-              console.log("Ambiente local: Gerando PIX de teste.");
-              const mockPixCode = "00020126580014BR.GOV.BCB.PIX0136vapex-pagamentos-teste-12345678905204000053039865802BR5913Vapex Store6009Sao Paulo62070503***6304ABCD";
-              setPixData({
-                pix_code: mockPixCode,
-                pix_qr_code: `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(mockPixCode)}`
-              });
+              const errorData = pixResponse ? await pixResponse.json().catch(() => ({})) : {};
+              alert("Não foi possível processar o pagamento via PIX. Por favor, tente novamente ou entre em contato com o suporte. Detalhes: " + (errorData.error || "Erro na API"));
             }
           } catch (pixErr) {
             console.error("Erro no processamento:", pixErr);

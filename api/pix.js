@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     const utmifyToken = process.env.UTMIFY_TOKEN;
 
     if (!apiKey) {
-      console.error("ERRO: Variável de ambiente PODPAY_API_KEY não configurada");
+      // console.error("ERRO: Variável de ambiente PODPAY_API_KEY não configurada");
       return res.status(500).json({ error: 'Erro de configuração do servidor (Podpay API Key)' });
     }
 
@@ -73,10 +73,10 @@ export default async function handler(req, res) {
         });
         
         const utmifyResult = await utmifyResponse.json().catch(() => ({}));
-        console.log("--- RESPOSTA UTMIFY ---", {
+        /* console.log("--- RESPOSTA UTMIFY ---", {
           status: utmifyResponse.status,
           data: utmifyResult
-        });
+        }); */
       } catch (e) {
         console.error("Erro ao enviar para Utmify:", e);
       }
@@ -120,7 +120,7 @@ export default async function handler(req, res) {
     });
 
     const responseData = await response.json();
-    console.log("--- RESPOSTA PODPAY ---", responseData);
+    // console.log("--- RESPOSTA PODPAY ---", responseData);
 
     const data = responseData.data || responseData;
 
