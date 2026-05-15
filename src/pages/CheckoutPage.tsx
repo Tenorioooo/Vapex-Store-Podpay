@@ -5,6 +5,7 @@ import { CreditCard, QrCode, FileText, Shield, Lock, ChevronRight, Check } from 
 import { useCart } from '../components/layout/CartContext';
 import { useAuth } from '../hooks/useSupabase';
 import { supabase } from '../lib/supabase';
+import ProductImage from '../components/ui/ProductImage';
 
 type PaymentMethod = 'pix' | 'card' | 'boleto';
 type Step = 'info' | 'payment' | 'confirm';
@@ -232,6 +233,53 @@ export default function CheckoutPage() {
               </div>
             </div>
 
+            {/* Order summary - also visible in info step */}
+            <div className="p-6 bg-[#0a0a0a] rounded-2xl border border-white/5 mt-8">
+              <h3 className="text-white font-semibold mb-4">Resumo do Pedido</h3>
+              <div className="space-y-4 mb-6 pb-6 border-b border-white/5">
+                {items.map((item) => (
+                  <div key={item.id} className="flex items-center gap-4 text-sm">
+                    <div className="w-12 h-12 shrink-0 rounded-lg overflow-hidden bg-white/5 border border-white/5">
+                      <ProductImage src={item.product?.image_url || null} alt={item.product?.name || ''} brand={item.product?.brand} size="sm" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-white font-medium line-clamp-1">{item.product?.name}</div>
+                      <div className="text-[10px] text-gray-400 mt-0.5">
+                        Qtd: {item.quantity} 
+                        {(item.flavor || item.color) && ' • '}
+                        {item.flavor && <span>{item.flavor}</span>}
+                        {item.flavor && item.color && <span className="mx-1">/</span>}
+                        {item.color && <span>{item.color}</span>}
+                      </div>
+                    </div>
+                    <div className="text-white font-semibold whitespace-nowrap">
+                      R$ {((item.product?.price ?? 0) * item.quantity).toFixed(2).replace('.', ',')}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between text-gray-400">
+                  <span>Subtotal ({items.length} itens)</span>
+                  <span>R$ {subtotal.toFixed(2).replace('.', ',')}</span>
+                </div>
+                {promoDiscount > 0 && (
+                  <div className="flex justify-between text-cyan-400">
+                    <span>Promoção Compre 1 Leve 2</span>
+                    <span>-R$ {promoDiscount.toFixed(2).replace('.', ',')}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-gray-400">
+                  <span>Frete</span>
+                  <span>{shipping === 0 ? <span className="text-emerald-400">Grátis</span> : `R$ ${shipping.toFixed(2).replace('.', ',')}`}</span>
+                </div>
+                <div className="border-t border-white/5 pt-2 flex justify-between text-white font-bold text-lg">
+                  <span>Total Estimado</span>
+                  <span>R$ {finalTotal.toFixed(2).replace('.', ',')}</span>
+                </div>
+              </div>
+            </div>
+
             <div className="flex justify-between mt-8">
               <Link to="/carrinho" className="px-6 py-3 text-gray-400 hover:text-white transition-colors text-sm">
                 Voltar ao carrinho
@@ -273,6 +321,31 @@ export default function CheckoutPage() {
             {/* Order summary */}
             <div className="p-6 bg-[#0a0a0a] rounded-2xl border border-white/5 mb-8">
               <h3 className="text-white font-semibold mb-4">Resumo do Pedido</h3>
+              
+              {/* Product List */}
+              <div className="space-y-4 mb-6 pb-6 border-b border-white/5">
+                {items.map((item) => (
+                  <div key={item.id} className="flex items-center gap-4 text-sm">
+                    <div className="w-12 h-12 shrink-0 rounded-lg overflow-hidden bg-white/5 border border-white/5">
+                      <ProductImage src={item.product?.image_url || null} alt={item.product?.name || ''} brand={item.product?.brand} size="sm" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-white font-medium line-clamp-1">{item.product?.name}</div>
+                      <div className="text-[10px] text-gray-400 mt-0.5">
+                        Qtd: {item.quantity} 
+                        {(item.flavor || item.color) && ' • '}
+                        {item.flavor && <span>{item.flavor}</span>}
+                        {item.flavor && item.color && <span className="mx-1">/</span>}
+                        {item.color && <span>{item.color}</span>}
+                      </div>
+                    </div>
+                    <div className="text-white font-semibold whitespace-nowrap">
+                      R$ {((item.product?.price ?? 0) * item.quantity).toFixed(2).replace('.', ',')}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between text-gray-400">
                   <span>Subtotal ({items.length} itens)</span>
