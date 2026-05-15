@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Star, ShoppingBag, Heart, Truck, Shield, CreditCard, ChevronRight, Minus, Plus } from 'lucide-react';
+import { Star, ShoppingBag, Heart, Truck, Shield, CreditCard, ChevronRight, Minus, Plus, Zap } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import type { Product, Review } from '../types';
 import { useCart } from '../components/layout/CartContext';
@@ -21,6 +21,7 @@ export default function ProductDetailPage() {
   const [activeTab, setActiveTab] = useState<'description' | 'specs' | 'reviews'>('description');
   const { addItem } = useCart();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!slug) return;
@@ -88,10 +89,15 @@ export default function ProductDetailPage() {
     ? Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)
     : 0;
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (openCart: boolean = true) => {
     for (let i = 0; i < quantity; i++) {
-      addItem(product, selectedFlavor || undefined, selectedColor || undefined);
+      addItem(product, selectedFlavor || undefined, selectedColor || undefined, openCart);
     }
+  };
+
+  const handleBuyNow = () => {
+    handleAddToCart(false);
+    navigate('/checkout');
   };
 
   return (
@@ -231,13 +237,20 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Actions */}
-            <div className="flex gap-3 mb-8">
+            <div className="flex flex-col sm:flex-row gap-3 mb-8">
               <button
                 onClick={handleAddToCart}
                 disabled={!product.in_stock}
-                className="flex-1 flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold rounded-2xl transition-all shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 flex items-center justify-center gap-2 px-8 py-4 bg-white/5 hover:bg-white/10 text-white font-bold rounded-2xl border border-white/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <ShoppingBag size={20} /> Adicionar ao Carrinho
+              </button>
+              <button
+                onClick={handleBuyNow}
+                disabled={!product.in_stock}
+                className="flex-[1.5] flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold rounded-2xl transition-all shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Zap size={20} /> Comprar Agora
               </button>
               <button className="p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-gray-400 hover:text-red-400 transition-colors">
                 <Heart size={20} />

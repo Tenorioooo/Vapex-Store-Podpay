@@ -9,7 +9,9 @@ interface CartContextType {
   total: number;
   subtotal: number;
   loading: boolean;
-  addItem: (product: Product, flavor?: string, color?: string) => Promise<void>;
+  isCartOpen: boolean;
+  setCartOpen: (open: boolean) => void;
+  addItem: (product: Product, flavor?: string, color?: string, openCart?: boolean) => Promise<void>;
   removeItem: (id: string) => Promise<void>;
   updateQuantity: (id: string, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
@@ -20,6 +22,7 @@ const CartContext = createContext<CartContextType | null>(null);
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isCartOpen, setCartOpen] = useState(false);
   const { user } = useAuth();
 
   const fetchCart = useCallback(async () => {
@@ -55,7 +58,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [items, user]);
 
-  const addItem = async (product: Product, flavor?: string, color?: string) => {
+  const addItem = async (product: Product, flavor?: string, color?: string, openCart: boolean = true) => {
     if (user) {
       const existing = items.find(i => i.product_id === product.id && i.flavor === (flavor || null) && i.color === (color || null));
       if (existing) {
@@ -87,6 +90,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setItems(prev => [...prev, newItem]);
       }
     }
+    if (openCart) setCartOpen(true);
   };
 
   const removeItem = async (id: string) => {
@@ -138,7 +142,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, 0);
 
   return (
-    <CartContext.Provider value={{ items, itemCount, total, subtotal, loading, addItem, removeItem, updateQuantity, clearCart }}>
+    <CartContext.Provider value={{ items, itemCount, total, subtotal, loading, isCartOpen, setCartOpen, addItem, removeItem, updateQuantity, clearCart }}>
       {children}
     </CartContext.Provider>
   );

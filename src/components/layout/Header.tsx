@@ -5,6 +5,7 @@ import { Search, User, Heart, ShoppingBag, Menu, X, ChevronDown, Settings } from
 import { useCart } from './CartContext';
 import { useAuth } from '../../hooks/useSupabase';
 import Logo from '../ui/Logo';
+import CartDrawer from './CartDrawer';
 
 const navLinks = [
   { label: 'Pods Descartáveis', href: '/categoria/pods-descartaveis' },
@@ -18,7 +19,7 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const { itemCount } = useCart();
+  const { itemCount, setCartOpen } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -83,7 +84,10 @@ export default function Header() {
                 className="p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/5 hidden sm:flex">
                 <Heart size={20} />
               </Link>
-              <Link to="/carrinho" className="relative p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/5">
+              <button 
+                onClick={() => setCartOpen(true)}
+                className="relative p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/5"
+              >
                 <ShoppingBag size={20} />
                 {itemCount > 0 && (
                   <motion.span
@@ -94,7 +98,7 @@ export default function Header() {
                     {itemCount}
                   </motion.span>
                 )}
-              </Link>
+              </button>
               <button onClick={() => setMobileOpen(true)}
                 className="p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/5 lg:hidden">
                 <Menu size={20} />
@@ -178,6 +182,8 @@ export default function Header() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <CartDrawer />
     </>
   );
 }

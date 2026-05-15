@@ -116,17 +116,18 @@ export default function FeaturedProducts() {
     else if (activeTab === 'new') query = query.eq('is_new', true);
     else query = query.not('compare_at_price', 'is', null);
 
-    query.limit(8).then(({ data }) => {
+    query.order('price', { ascending: true }).then(({ data }) => {
       if (data && data.length > 0) {
         setProducts(data as Product[]);
       } else {
         // Use local data when Supabase is missing
-        setProducts(MOCK_PRODUCTS.filter(p => {
+        const filtered = MOCK_PRODUCTS.filter(p => {
           if (activeTab === 'featured') return p.badge === 'Mais Vendido';
           if (activeTab === 'new') return p.is_new;
           if (activeTab === 'offers') return (p.compare_at_price ?? 0) > 0;
           return true;
-        }));
+        });
+        setProducts(filtered.sort((a, b) => a.price - b.price));
       }
     });
   }, [activeTab]);
